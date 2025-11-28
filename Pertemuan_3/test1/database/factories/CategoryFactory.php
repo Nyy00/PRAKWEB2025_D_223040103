@@ -3,9 +3,8 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
 
-class UserFactory extends Factory
+class CategoryFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -17,10 +16,7 @@ class UserFactory extends Factory
         $faker = \Faker\Factory::create('id_ID');
 
         return [
-            'name' => $faker->name(),
-            'username' => $faker->unique()->userName(),
-            'email' => $faker->unique()->safeEmail(),
-            'password' => Hash::make('password'),
+            'name' => $faker->unique()->word(),
         ];
     }
 }
