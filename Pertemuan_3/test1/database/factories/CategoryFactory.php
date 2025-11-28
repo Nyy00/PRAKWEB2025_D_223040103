@@ -13,10 +13,21 @@ class CategoryFactory extends Factory
      */
     public function definition(): array
     {
-        $faker = \Faker\Factory::create('id_ID');
+        $categories = [
+            'Pemrograman Web',
+            'Framework PHP',
+            'Frontend Development',
+            'Backend Development',
+            'Database',
+            'UI/UX Design',
+            'Tutorial Laravel',
+            'Tips & Trik',
+            'Best Practices',
+            'Keamanan Web',
+        ];
 
         return [
-            'name' => $faker->unique()->word(),
+            'name' => fake()->unique()->randomElement($categories),
         ];
     }
 }
