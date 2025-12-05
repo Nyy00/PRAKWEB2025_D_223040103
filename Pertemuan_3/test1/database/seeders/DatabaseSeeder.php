@@ -2,35 +2,42 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Category;
 use App\Models\Post;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // Membuat 5 User
-        $users = User::factory(5)->create();
+        // Buat user default
+        $user1 = User::factory()->create([
+            'name' => 'John Doe',
+            'username' => 'johndoe',
+            'email' => 'john@example.com',
+            'password' => bcrypt('password'),
+        ]);
 
-        // Membuat 2 Category
-        $categories = Category::factory(2)->create();
+        $user2 = User::factory()->create([
+            'name' => 'Jane Smith',
+            'username' => 'janesmith',
+            'email' => 'jane@example.com',
+            'password' => bcrypt('password'),
+        ]);
 
-        // Membuat 10 Post dengan assign ke user dan category yang sudah ada
-        Post::factory(10)
-            ->state(function () use ($users, $categories) {
-                return [
-                    'user_id' => $users->random()->id,
-                    'category_id' => $categories->random()->id,
-                ];
-            })
-            ->create();
+        // Buat 5 kategori
+        $categories = Category::factory(5)->create();
+
+        // Buat 20 posts dengan relasi ke user dan category yang sudah ada
+        Post::factory(10)->create([
+            'user_id' => $user1->id,
+            'category_id' => $categories->random()->id,
+        ]);
+
+        Post::factory(10)->create([
+            'user_id' => $user2->id,
+            'category_id' => $categories->random()->id,
+        ]);
     }
 }

@@ -22,5 +22,8 @@ class AppServiceProvider extends ServiceProvider
     {
         // Set locale for Carbon to Indonesian for translated dates
         Carbon::setLocale('id');
+        
+        // Register Post Policy
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Post::class, \App\Policies\PostPolicy::class);
     }
 }

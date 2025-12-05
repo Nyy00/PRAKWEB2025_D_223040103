@@ -2,59 +2,46 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
     use HasFactory;
 
-    // Melindungi kolom 'id' dari mass assignment, kolom lain bebas diisi
-    protected $guarded = ['id'];
+    protected $fillable = [
+        'title',
+        'slug',
+        'excerpt',
+        'body',
+        'image',
+        'published_at',
+        'user_id',
+        'category_id'
+    ];
 
-    // Eager Loading: Otomatis load relasi author dan category saat query Post
-    protected $with = ['user', 'category'];
+    protected $casts = [
+        'published_at' => 'datetime',
+    ];
 
-    // Relasi Many-to-One: Post ditulis oleh satu User (author)
-    public function author(): BelongsTo
+    // Relasi Many to One: Post dimiliki oleh satu User
+    public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
 
-    // Alias untuk backward compatibility dengan views yang menggunakan user()
-    public function user(): BelongsTo
+    // Relasi Many to One: Post dimiliki oleh satu Category
+    public function category()
     {
-        return $this->author();
+        return $this->belongsTo(Category::class);
     }
 
-    // Relasi Many-to-One: Post masuk dalam satu Category
-    public function category(): BelongsTo
+    // Scope untuk search
+    public function scopeFilter($query, array $filters)
     {
-        return $this->belongsTo(Category::class, 'category_id');
-    }
-
-    // Query Scope: Filter pencarian berdasarkan search, category, atau author
-    public function scopeFilter(Builder $query, array $filters): void
-    {
-        $query->when(
-            $filters['search'] ?? false,
-            fn($query, $search) => $query->where('title', 'like', '%' . $search . '%')
-        );
-
-        $query->when(
-            $filters['category'] ?? false,
-            fn($query, $category) => $query->whereHas('category', fn($query) =>
-                $query->where('name', $category)
-            )
-        );
-
-        $query->when(
-            $filters['author'] ?? false,
-            fn($query, $author) => $query->whereHas('author', fn($query) =>
-                $query->where('username', $author)
-            )
-        );
+        $query->when($filters['search'] ?? false, function ($query, $search) {
+            return $query->where('title', 'like', '%' . $search . '%')
+                        ->orWhere('body', 'like', '%' . $search . '%');
+        });
     }
 }
